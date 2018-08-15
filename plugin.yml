@@ -1,0 +1,5 @@
+name: MineStatic
+main: com.mcsunnyside.minestatic.Main
+version: 1.0.0-SNAPSHOT
+description: Our memory and Our home
+api-version: 1.13
