@@ -16,7 +16,6 @@ public class HttpUtils {
 	     * @return 所代表远程资源的响应结果
 	     */
 	    public static String sendPost(String url, String param) {
-	    	System.out.println("[MineStats] "+param);
 	        PrintWriter out = null;
 	        BufferedReader in = null;
 	        StringBuilder result = new StringBuilder();

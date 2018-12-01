@@ -57,6 +57,12 @@ public class Main extends JavaPlugin implements Listener {
 			}else {
 				getLogger().warning("Failed loading file "+path.toString());
 			}
+			try {
+				Thread.sleep(500);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		
 	}
