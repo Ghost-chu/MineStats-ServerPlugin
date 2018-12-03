@@ -45,7 +45,6 @@ public class HttpUtils {
 	            while ((line = in.readLine()) != null) {
 	                result.append(line);
 	            }
-	            System.out.println("[MineStats] "+result);
 	        } catch (Exception e) {
 	        	e.printStackTrace();
 	           // LOGGER.error("HTTP POST error : {}", e.getMessage());
@@ -61,4 +60,5 @@ public class HttpUtils {
 	        }
 	        return result.toString();
 	    }
+	   
 }

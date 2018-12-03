@@ -3,6 +3,8 @@ package com.mcsunnyside.minestats;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
@@ -38,38 +40,49 @@ public class Main extends JavaPlugin implements Listener {
 		String mainWorld = getServer().getWorlds().get(0).getName();
 		File worldsFolder = new File(getServer().getWorldContainer().getPath(), mainWorld);
 		File statsFolder =  new File(worldsFolder,"stats");
+		File playerDataFolder = new File(worldsFolder,"playerdata");
 		for (OfflinePlayer offlinePlayer : players) {
-			getLogger().info("Reading "+offlinePlayer.getName()+"'s profile...");
+			//Stats
 			UUID uuid = offlinePlayer.getUniqueId();
 			String uuidtext = uuid.toString().toLowerCase();
-			File path = new File(statsFolder,uuidtext+".json");
-			if (path.exists()&&path.canRead()) {
-				String string = readFile(path);
+			File statsPath = new File(statsFolder,uuidtext+".json");
+			File playerDataPath =  new File(playerDataFolder,uuidtext+".dat");
+			if (statsPath.exists()&&statsPath.canRead()&&playerDataPath.exists()&& playerDataPath.canRead()) {
+				String string = readFile(statsPath);
 				String finalString = Base64.getEncoder().encodeToString(string.getBytes());
+				String profileString = null;
+				try {
+					profileString = readFileByBytes(playerDataPath);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 				Map<String,String> dataMap = new HashMap<>();
 				dataMap.put("type", "updateData");
 				dataMap.put("uuid", uuidtext);
 				dataMap.put("name", offlinePlayer.getName());
 				dataMap.put("data", finalString);
-				dataMap.put("key", "YOUR LICENSE");
-				getLogger().info("Uploading "+offlinePlayer.getName()+"'s profile...");
-				HttpUtils.sendPost("http://api.mcsunnyside.com/game/mojang/minecraft/gameprofile/sunnyside/submit.php", JSONObject.toJSONString(dataMap));
+				dataMap.put("profile", profileString);
+				dataMap.put("key", "KEY");
+				if(offlinePlayer.isBanned()) {
+					dataMap.put("banned", "1");
+				}else {
+					dataMap.put("banned", "0");
+				}
+				getLogger().info("Uploading "+offlinePlayer.getName()+"'s stats...");
+				getLogger().info("Upload result: "+HttpUtils.sendPost("http://api.mcsunnyside.com/game/mojang/minecraft/gameprofile/sunnyside/submit.php", JSONObject.toJSONString(dataMap)));
 			}else {
-				getLogger().warning("Failed loading file "+path.toString());
-			}
-			try {
-				Thread.sleep(500);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				getLogger().warning("Failed loading file "+statsPath.toString());
 			}
 		}
-		
 	}
 	@Override
 	public void onDisable() {
 
 	}
+	    public static String readFileByBytes(File file) throws IOException {
+	    	return Base64.getEncoder().encodeToString(Files.readAllBytes(file.toPath()));
+	    }
 	protected String readFile(File file) {
 		StringBuilder result = new StringBuilder();
 		try{
