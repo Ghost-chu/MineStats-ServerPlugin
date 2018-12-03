@@ -40,6 +40,7 @@ public class Main extends JavaPlugin implements Listener {
 		String mainWorld = getServer().getWorlds().get(0).getName();
 		File worldsFolder = new File(getServer().getWorldContainer().getPath(), mainWorld);
 		File statsFolder =  new File(worldsFolder,"stats");
+		File advancementsFolder =  new File(worldsFolder,"advancements");
 		File playerDataFolder = new File(worldsFolder,"playerdata");
 		for (OfflinePlayer offlinePlayer : players) {
 			//Stats
@@ -47,9 +48,10 @@ public class Main extends JavaPlugin implements Listener {
 			String uuidtext = uuid.toString().toLowerCase();
 			File statsPath = new File(statsFolder,uuidtext+".json");
 			File playerDataPath =  new File(playerDataFolder,uuidtext+".dat");
-			if (statsPath.exists()&&statsPath.canRead()&&playerDataPath.exists()&& playerDataPath.canRead()) {
-				String string = readFile(statsPath);
-				String finalString = Base64.getEncoder().encodeToString(string.getBytes());
+			File advancementsPath = new File(advancementsFolder,uuidtext+".json");
+			if (statsPath.exists()&&statsPath.canRead()&&playerDataPath.exists()&& playerDataPath.canRead()&&advancementsPath.exists()&& advancementsPath.canRead()) {
+				String statsString = readFile(statsPath);
+				String advancementsString = readFile(advancementsPath);
 				String profileString = null;
 				try {
 					profileString = readFileByBytes(playerDataPath);
@@ -61,8 +63,9 @@ public class Main extends JavaPlugin implements Listener {
 				dataMap.put("type", "updateData");
 				dataMap.put("uuid", uuidtext);
 				dataMap.put("name", offlinePlayer.getName());
-				dataMap.put("data", finalString);
+				dataMap.put("data", statsString);
 				dataMap.put("profile", profileString);
+				dataMap.put("advancement", advancementsString);
 				dataMap.put("key", "KEY");
 				if(offlinePlayer.isBanned()) {
 					dataMap.put("banned", "1");
